@@ -1,89 +1,18 @@
-import { useEffect, useState } from 'react';
-
-function TitleMirror() {
-  const [title, setTitle] = useState('');
-
-  useEffect(() => {
-  console.log('clock started');
-  const id = setInterval(() => setTime(new Date()), 1000);
-  return () => {
-    console.log('clock stopped');
-    clearInterval(id);
-  };
-}, []);
-
-  return (
-    <label>
-      Tab title:{' '}
-      <input value={title} onChange={(e) => setTitle(e.target.value)} />
-    </label>
-  );
-}
-
-function SavedNote() {
-  const [note, setNote] = useState(() => {
-    try {
-      return localStorage.getItem('lab-note') ?? '';
-    } catch {
-      return '';
-    }
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('lab-note', note);
-    } catch (error) {
-      console.error(error);
-    }
-  }, [note]);
-
-  return (
-    <label>
-      Saved note:{' '}
-      <textarea value={note} onChange={(e) => setNote(e.target.value)} />
-        <button onClick={() => setNote('')}>Clear saved note</button>
-    </label>
-  );
-}
-
-function LiveClock() {
-  const [time, setTime] = useState(() => new Date());
-
-  useEffect(() => {
-    const id = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  return <p>Time: {time.toLocaleTimeString()}</p>;
-}
+import { useState } from 'react';
+import EffectsLab from './labs/EffectsLab';
+import LeakyEffectsLab from './labs/LeakyEffectsLab';
 
 export default function App() {
-  const [showClock, setShowClock] = useState(true);
+  const [lab, setLab] = useState('effects');
 
   return (
-    <main style={{ maxWidth: 640, margin: '30px auto' }}>
-      <h1>Effects Lab</h1>
-      <p>Three examples of syncing with the browser.</p>
-      <TitleMirror />
+    <main style={{ maxWidth: 640, margin: '30px auto', padding: '0 16px' }}>
+      <nav>
+        <button onClick={() => setLab('effects')}>Lab 12: Effects</button>{' '}
+        <button onClick={() => setLab('leaky')}>Lab 15: Leaky Effects</button>
+      </nav>
       <hr />
-      <SavedNote />
-      <hr />
-      <button onClick={() => setShowClock((v) => !v)}>
-        {showClock ? 'Hide clock' : 'Show clock'}
-      </button>
-      {showClock && <LiveClock />}
-      <WindowWidth />
+      {lab === 'effects' ? <EffectsLab /> : <LeakyEffectsLab />}
     </main>
   );
-}
-function WindowWidth() {
-  const [width, setWidth] = useState(() => window.innerWidth);
-
-  useEffect(() => {
-    const handleResize = () => setWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return <p>Window width: {width}px</p>;
 }
